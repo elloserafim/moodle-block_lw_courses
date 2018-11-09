@@ -88,6 +88,7 @@ class block_lw_courses extends block_base {
             $this->content->text .= get_string('nocourses', 'my');
         } else {
             // For each course, build category cache.
+            $this->content->text .= $renderer->hidden_courses($totalcourses - count($sortedcourses));
             $this->content->text .= $renderer->lw_courses($sortedcourses);
             $this->content->text .= $renderer->hidden_courses($totalcourses - count($sortedcourses));
         }

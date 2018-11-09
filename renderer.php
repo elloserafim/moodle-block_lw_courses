@@ -131,9 +131,13 @@ class block_lw_courses_renderer extends plugin_renderer_base {
             if ($ismovingcourse && ($course->id == $movingcourseid)) {
                 continue;
             }
+            $coursehiddenclass = '';
+            if(!$course->visible || empty($course->visible)){
+                $coursehiddenclass =' hiddencourse';
+            }
 
             $html .= $this->output->box_start(
-                "coursebox $courseclass span$startvalue col-md-$startvalue $courseclass col-xs-12",
+                "coursebox $courseclass $coursehiddenclass span$startvalue col-md-$startvalue $courseclass col-xs-12",
                 "course-{$course->id}");
             $html .= $this->course_image($course);
 
@@ -143,12 +147,24 @@ class block_lw_courses_renderer extends plugin_renderer_base {
             $teachers = get_role_users($role->id, $context, false, $fields);
             $teacherimages = html_writer::start_div('teacher_image_wrap');
             $teachernames = '';
+
+
             if ($config->showteachers != BLOCKS_LW_COURSES_SHOWTEACHERS_NO) {
+                $teacherstring = (count($teachers) > 1? get_string('defaultcourseteachers'): get_string('defaultcourseteacher')).": ";
                 foreach ($teachers as $key => $teacher) {
-                    $teachername = get_string('defaultcourseteacher') . ': ' . fullname($teacher);
+                    $teachername = $teacherstring . ($teacher->firstname);
                     $teachernames .= html_writer::tag('p', $teachername, array('class' => 'teacher_name'));
                     $teacherimages .= html_writer::div($OUTPUT->user_picture($teacher, array('size' => 50, 'class' => '')), 'teacher_image');
+                    $teacherstring  = ', ';
                 }
+            }
+            if(!$course->visible) {
+                $teachernames = '<p><strong><i class="fa fa-eye-slash"></i>  '. get_string('coursehiddentext', 'block_lw_courses').'.</strong></p>'.$teachernames;
+
+                $teacherimages .= html_writer::start_div('', array('style' => 'font-size: 25px; vertical-align: bottom; text-align: middle; font-weight: bold;'));
+                $teacherimages .= html_writer::tag('i', '', array('class'=>'fa fa-eye-slash'));
+                $teacherimages .= get_string('coursehidden', 'block_lw_courses');
+                $teacherimages .= html_writer::end_div();
             }
             $teacherimages .= html_writer::end_div();
             $html .= $teacherimages;
@@ -176,7 +192,7 @@ class block_lw_courses_renderer extends plugin_renderer_base {
             // No need to pass title through s() here as it will be done automatically by html_writer.
             $attributes = array('title' => $course->fullname);
             if ($course->id > 0) {
-                if (empty($course->visible)) {
+                if (!($course->visible)) {
                     $attributes['class'] = 'dimmed';
                 }
                 $courseurl = new moodle_url('/course/view.php', array('id' => $course->id));

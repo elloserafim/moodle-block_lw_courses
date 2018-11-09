@@ -105,3 +105,5 @@ $string['startgrid_desc'] = "This will render the courses in a grid straight awa
 $string['noprogress'] = ": enable course completion tracking!";
 $string['progressunavail'] = "Progress unavailable";
 $string['nocompletion'] = "Completion not enabled";
+$string['coursehidden'] = "Hidden from students";
+$string['coursehiddentext'] = "This course is hidden from students";
